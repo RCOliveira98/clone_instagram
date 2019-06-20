@@ -18,16 +18,32 @@ const db = new mongodb.Db(
     new mongodb.Server('localhost', 27017, {}), {}
 );
 
-// api
+// teste da api com post
 app.post('/api', (req, res) => {
     let dados = req.body;
     db.open((err, mongoclient) => {
         mongoclient.collection('postagens', (err, collection) => {
-            collection.insert(dados, (err, records) => {
+            collection.insert(dados, (err, results) => {
                 if (err) {
                     res.json(err);
                 } else {
-                    res.json(records);
+                    res.json(results);
+                }
+                mongoclient.close();
+            });
+        });
+    });
+});
+
+// método get
+app.get('/api', (req, res) => {
+    db.open((err, mongoclient) => {
+        mongoclient.collection('postagens', (err, collection) => {
+            collection.find().toArray((err, results) => {
+                if (err) {
+                    res.json(err);
+                } else {
+                    res.json(results);
                 }
                 mongoclient.close();
             });
