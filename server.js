@@ -25,7 +25,7 @@ app.post('/api', (req, res) => {
     db.open((err, mongoclient) => {
         mongoclient.collection('postagens', (err, collection) => {
             collection.insert(dados, (err, results) => {
-                err ? res.json(err) : res.json(results);
+                err ? res.json(err) : res.status(200).json(results);
                 mongoclient.close();
             });
         });
@@ -37,7 +37,7 @@ app.get('/api', (req, res) => {
     db.open((err, mongoclient) => {
         mongoclient.collection('postagens', (err, collection) => {
             collection.find().toArray((err, results) => {
-                err ? res.json(err) : res.json(results);
+                err ? res.json(err) : res.status(200).json(results);
                 mongoclient.close();
             });
         });
@@ -49,7 +49,7 @@ app.get('/api/:id', (req, res) => {
     db.open((err, mongoclient) => {
         mongoclient.collection('postagens', (err, collection) => {
             collection.find(objectId(req.params.id)).toArray((err, results) => {
-                err ? res.json(err) : res.json(results);
+                err ? res.json(err) : res.status(200).json(results);
                 mongoclient.close();
             });
         });
@@ -64,7 +64,7 @@ app.put('/api/:id_item', (req, res) => {
                 { $set: { title: req.body.title, img: req.body.img } }, //action
                 {}, // essa ação deve se propagar por múltiplas linha? Default: No. {multi: false ou true}
                 (err, results) => {
-                    err ? res.json(err) : res.json(results);
+                    err ? res.json(err) : res.status(200).json(results);
                     mongoclient.close();
                 }
             );
@@ -77,7 +77,7 @@ app.delete('/api/:id', (req, res) => {
     db.open((err, dbclient) => {
         dbclient.collection('postagens', (erro, colecao) => {
             colecao.remove({ _id: objectId(req.params.id) }, (erro, results) => {
-                erro ? res.json(erro) : res.json(results);
+                erro ? res.json(erro) : res.status(200).json(results);
                 dbclient.close();
             });
         });
