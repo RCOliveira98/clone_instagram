@@ -71,3 +71,15 @@ app.put('/api/:id_item', (req, res) => {
         });
     });
 });
+
+// método delete by id
+app.delete('/api/:id', (req, res) => {
+    db.open((err, dbclient) => {
+        dbclient.collection('postagens', (erro, colecao) => {
+            colecao.remove({ _id: objectId(req.params.id) }, (erro, results) => {
+                erro ? res.json(erro) : res.json(results);
+                dbclient.close();
+            });
+        });
+    });
+});
