@@ -2,6 +2,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongodb = require('mongodb');
+const objectId = require('mongodb').ObjectID;
 // start do módulo express
 const app = express();
 // configurando middlware body-parser
@@ -18,7 +19,7 @@ const db = new mongodb.Db(
     new mongodb.Server('localhost', 27017, {}), {}
 );
 
-// teste da api com post
+// método post
 app.post('/api', (req, res) => {
     let dados = req.body;
     db.open((err, mongoclient) => {
@@ -40,6 +41,22 @@ app.get('/api', (req, res) => {
     db.open((err, mongoclient) => {
         mongoclient.collection('postagens', (err, collection) => {
             collection.find().toArray((err, results) => {
+                if (err) {
+                    res.json(err);
+                } else {
+                    res.json(results);
+                }
+                mongoclient.close();
+            });
+        });
+    });
+});
+
+// método get by id
+app.get('/api/:id', (req, res) => {
+    db.open((err, mongoclient) => {
+        mongoclient.collection('postagens', (err, collection) => {
+            collection.find(objectId(req.params.id)).toArray((err, results) => {
                 if (err) {
                     res.json(err);
                 } else {
