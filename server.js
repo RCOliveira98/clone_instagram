@@ -25,11 +25,7 @@ app.post('/api', (req, res) => {
     db.open((err, mongoclient) => {
         mongoclient.collection('postagens', (err, collection) => {
             collection.insert(dados, (err, results) => {
-                if (err) {
-                    res.json(err);
-                } else {
-                    res.json(results);
-                }
+                err ? res.json(err) : res.json(results);
                 mongoclient.close();
             });
         });
@@ -41,11 +37,7 @@ app.get('/api', (req, res) => {
     db.open((err, mongoclient) => {
         mongoclient.collection('postagens', (err, collection) => {
             collection.find().toArray((err, results) => {
-                if (err) {
-                    res.json(err);
-                } else {
-                    res.json(results);
-                }
+                err ? res.json(err) : res.json(results);
                 mongoclient.close();
             });
         });
@@ -57,13 +49,25 @@ app.get('/api/:id', (req, res) => {
     db.open((err, mongoclient) => {
         mongoclient.collection('postagens', (err, collection) => {
             collection.find(objectId(req.params.id)).toArray((err, results) => {
-                if (err) {
-                    res.json(err);
-                } else {
-                    res.json(results);
-                }
+                err ? res.json(err) : res.json(results);
                 mongoclient.close();
             });
+        });
+    });
+});
+
+// método put by id
+app.put('/api/:id_item', (req, res) => {
+    db.open((err, mongoclient) => {
+        mongoclient.collection('postagens', (err, collection) => {
+            collection.update({ _id: objectId(req.params.id_item) }, // condição da query
+                { $set: { title: req.body.title, img: req.body.img } }, //action
+                {}, // essa ação deve se propagar por múltiplas linha? Default: No. {multi: false ou true}
+                (err, results) => {
+                    err ? res.json(err) : res.json(results);
+                    mongoclient.close();
+                }
+            );
         });
     });
 });
