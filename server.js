@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const mongodb = require('mongodb');
 const objectId = require('mongodb').ObjectID;
 const multiparty = require('connect-multiparty');
+const mv = require('mv'); // manipulação de arquivos dentro do nodejs em S.O linux. Windows fs = file system
+
 // start do módulo express
 const app = express();
 // configurando middlwares
@@ -27,16 +29,40 @@ app.post('/api', (req, res) => {
 
     // fornecendo response para a nossa app client
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3200');
-
+    // dados do formulário
     let dados = req.body;
+    let date = new Date();
+    let time_stamp = date.getTime();
+
+    let url_imagem_file = time_stamp + '_' + req.files.arquivo.originalFilename;
+
+    var path_origem = req.files.arquivo.path;
+    var path_destino = './uploads/' + url_imagem_file;
+
+    var success = undefined;
+
+    mv(path_origem, path_destino, (err) => {
+        if (err) {
+            res.status(500).json({ error: err });
+            return;
+        }
+        // res.status(200).json(dados);
+        success = {
+            url_img: url_imagem_file,
+            title: req.body.titulo,
+        };
+    });
+
+    // conectando e inserindo
     db.open((err, mongoclient) => {
         mongoclient.collection('postagens', (err, collection) => {
-            collection.insert(dados, (err, results) => {
+            collection.insert(success, (err, results) => {
                 err ? res.json(err) : res.status(200).json(results);
                 mongoclient.close();
             });
         });
     });
+
 });
 
 // método get
