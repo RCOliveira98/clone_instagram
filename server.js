@@ -3,11 +3,14 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongodb = require('mongodb');
 const objectId = require('mongodb').ObjectID;
+const multiparty = require('connect-multiparty');
 // start do módulo express
 const app = express();
-// configurando middlware body-parser
+// configurando middlwares
 app.use(bodyParser.urlencoded({ extended: true })); // recebendo dados via url
 app.use(bodyParser.json()); // recebendo dados no formato json
+app.use(multiparty()); // forms com arquivos
+
 // detalhes do servidor
 const port = 3000;
 
@@ -21,6 +24,10 @@ const db = new mongodb.Db(
 
 // método post
 app.post('/api', (req, res) => {
+
+    // fornecendo response para a nossa app client
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3200');
+
     let dados = req.body;
     db.open((err, mongoclient) => {
         mongoclient.collection('postagens', (err, collection) => {
