@@ -28,7 +28,8 @@ const db = new mongodb.Db(
 app.post('/api', (req, res) => {
 
     // fornecendo response para a nossa app client
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3200');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    // http://localhost:3200
     // dados do formulário
     let dados = req.body;
     let date = new Date();
@@ -67,6 +68,8 @@ app.post('/api', (req, res) => {
 
 // método get
 app.get('/api', (req, res) => {
+    // fornecendo response para a nossa app client
+    res.setHeader('Access-Control-Allow-Origin', '*');
     db.open((err, mongoclient) => {
         mongoclient.collection('postagens', (err, collection) => {
             collection.find().toArray((err, results) => {
