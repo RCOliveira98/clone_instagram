@@ -13,6 +13,16 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true })); // recebendo dados via url
 app.use(bodyParser.json()); // recebendo dados no formato json
 app.use(multiparty()); // forms com arquivos
+app.use(function(req, res, next) {
+
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+    res.setHeader("Access-Control-Allow-Headers", "content-type");
+    res.setHeader("Access-Control-Allow-Credentials", true);
+
+    next();
+
+});
 
 // detalhes do servidor
 const port = 3000;
@@ -29,7 +39,7 @@ const db = new mongodb.Db(
 app.post('/api', (req, res) => {
 
     // fornecendo response para a nossa app client
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    // res.setHeader('Access-Control-Allow-Origin', '*');
     // http://localhost:3200
     // dados do formulário
     let dados = req.body;
@@ -98,7 +108,14 @@ app.put('/api/:id_item', (req, res) => {
     db.open((err, mongoclient) => {
         mongoclient.collection('postagens', (err, collection) => {
             collection.update({ _id: objectId(req.params.id_item) }, // condição da query
-                { $set: { title: req.body.title, img: req.body.img } }, //action
+                {
+                    $push: {
+                        comentarios: {
+                            id_comentario: new objectId(),
+                            comentario: req.body.comentario
+                        }
+                    }
+                }, //action
                 {}, // essa ação deve se propagar por múltiplas linha? Default: No. {multi: false ou true}
                 (err, results) => {
                     err ? res.json(err) : res.status(200).json(results);
