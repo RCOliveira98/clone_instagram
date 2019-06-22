@@ -5,6 +5,7 @@ const mongodb = require('mongodb');
 const objectId = require('mongodb').ObjectID;
 const multiparty = require('connect-multiparty');
 const mv = require('mv'); // manipulação de arquivos dentro do nodejs em S.O linux. Windows fs = file system
+const fs = require('fs'); // file system
 
 // start do módulo express
 const app = express();
@@ -118,4 +119,20 @@ app.delete('/api/:id', (req, res) => {
             });
         });
     });
+});
+
+
+app.get('/imagens/:imagem', (req, res) => {
+    let img = req.params.imagem;
+
+    fs.readFile('./uploads/' + img, (err, results) => {
+        if (err) {
+            res.status(400).json(err);
+            return;
+        }
+        // definindo o cabeçalho -> contentType
+        res.writeHead(200, { 'content-type': 'image/jpg' });
+        res.end(results);
+    });
+
 });
